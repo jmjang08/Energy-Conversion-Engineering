@@ -1,0 +1,107 @@
+$UnitSystem SI Mass Rad MPa C kJ
+R$ = 'Water'	"string variable"
+ 
+"Assumptions"
+"1. No pressure drop across all heat exchangers"
+"2. Water exiting condenser (state 7) is assumed to be a saturated liquid"
+"3. All cycle components are adiabatic with the environment"
+"4. Water exiting open heater (state 9) is assumed to be a saturated liquid"
+"5. Pumps and Turbines are all ideal"
+ 
+"Problem (a&b)"
+P[1] = 8
+P[2] = 2
+P[3] = 0.7
+P[4] = 0.7
+P[5] = 0.3
+P[6] = 0.008
+P[7] = 0.008
+P[8] = 0.3
+P[9] = 0.3
+P[10] = 8
+P[11] = 8
+P[12] = 2
+P[13] = 0.3
+ 
+T[1] = 480
+T[2] = temperature(R$,P=P[2],h=h[2])
+T[3] = temperature(R$,P=P[3],h=h[3])
+T[4] = 440
+T[5] = temperature(R$,P=P[5],h=h[5])
+T[6] = temperature(R$,P=P[6],h=h[6])
+T[7] = temperature(R$,P=P[7],x=0)
+T[8] = temperature(R$,P=P[8],h=h[8])
+T[9] = temperature(R$,P=P[9],h=h[9])
+T[10] = temperature(R$,P=P[10],h=h[10])
+T[11] = 205
+T[12] = temperature(R$,P=P[12],x=0)
+T[13] = temperature(R$,P=P[13],h=h[13])
+ 
+h[1] = enthalpy(R$,P=P[1],T=T[1])
+h[2] = enthalpy(R$,P=P[2],s=s[2])
+h[3] = enthalpy(R$,P=P[3],s=s[3])
+h[4] = enthalpy(R$,P=P[4],T=T[4])
+h[5] = enthalpy(R$,P=P[5],s=s[5])
+h[6] = enthalpy(R$,P=P[6],s=s[6])
+h[7] = enthalpy(R$,P=P[7],x=0)
+h[8] = enthalpy(R$,P=P[8],s=s[8])
+h[9] = enthalpy(R$,x=0,P=P[9])
+h[10] = enthalpy(R$,P=P[10],s=s[10])
+h[11] = enthalpy(R$,P=P[11],T=T[11])
+h[12] = enthalpy(R$,P=P[12],x=0)
+h[13] = h[12]
+ 
+s[1] = entropy(R$,P=P[1],T=T[1])
+s[2] = s[1]
+s[3] = s[1]
+s[4] = entropy(R$,P=P[4],T=T[4])
+s[5] = s[4]
+s[6] = s[4]
+s[7] = entropy(R$,P=P[7],x=0)
+s[8] = s[7]
+s[9] = entropy(R$,x=0,P=P[9])
+s[10] = s[9]
+s[11] = entropy(R$,P=P[11],T=T[11])
+s[12] = entropy(R$,P=P[12],x=0)
+s[13] = entropy(R$,P=P[13],h=h[13])
+ 
+ 
+"Problem (c)"
+"Closed Heater"
+(h[11] - h[10]) = y1 * (h[2] - h[12])
+"Open Heater"
+y2 * h[5] + (1 - y1 - y2) * h[8] + y1 * h[13] = h[9]
+ 
+ 
+"Problem (d)"
+"Turbine 1"
+w_t1 = h[1] - y1 * h[2] - (1 - y1) * h[3]
+"Turbine 2"
+w_t2 = (1 - y1) * h[4] - y2 * h[5] - (1 - y1 - y2) * h[6]
+"Pump 1"
+w_p1 = (1 - y1 - y2) * (h[8] - h[7])
+"Pump 2"
+w_p2 = h[10] - h[9]
+ 
+ 
+"Problem (e&f)" 
+"Thermal efficiency"
+q_in = h[1] - h[11] + (1 - y1) * (h[4] - h[3])
+eta_th = ((w_t1 + w_t2 - w_p1 - w_p2) / q_in) * 100[%]
+ 
+ 
+"Problem (g&h)" 
+"Mass flow rate"
+W_net = 100000 [kW]
+W_net = mdot_1*(w_t1+w_t2-w_p1-w_p2)
+"Condenser"
+mdot_1*(1-y1-y2)*(h[6]-h[7]) = mdot_cw*(enthalpy(R$,T=35,P=0.1)-enthalpy(R$,T=15,P=0.1))
+ 
+ 
+"Problem (i)" 
+"Irreversibilities"
+T_0 = 25+273.15
+Irr_closedfeedheater = T_0*(mdot_1*(s[11]-s[10])-mdot_1*y1*(s[2]-s[12]))
+Irr_openfeedheater = T_0*(mdot_1*(s[9]-y2*s[5]-(1-y1-y2)*s[8]-y1*s[13]))
+Irr_throttle = T_0*mdot_1*y1*(s[13]-s[12])
+Irr_condenser = T_0*(mdot_1*(1-y1-y2)*(s[7]-s[6])+mdot_cw*(entropy(R$,T=35,P=0.1)-entropy(R$,T=15,P=0.1)))

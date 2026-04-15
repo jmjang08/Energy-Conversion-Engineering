@@ -1,0 +1,40 @@
+$UnitSystem SI MASS RAD PA K J
+R$='Nitrogen'	"string variable"
+ 
+"knowns"
+T_0 = 300 [K]
+P_0 = 100000 [Pa]
+ 
+T_1 = 300 [K]
+"P_1 = 1000000 [Pa]"
+m = 1 [kg]
+ 
+C_p0 = cp(R$,T=T_0,P=P_0) "[J/kg-K]"    
+C_p1 = cp(R$,T=T_1,P=P_1) "[J/kg-K]"    
+C_p = 0.5*(C_p0+C_p1)
+ 
+C_v0 = cv(R$,T=T_0,P=P_0) "[J/kg-K]"     
+C_v1 = cv(R$,T=T_1,P=P_1) "[J/kg-K]"     
+C_v = 0.5*(C_v0+C_v1) 
+ 
+rho = density(R$,T=T_0,P=P_0) "[kg/m^3]"
+R = 296.8 [J/kg-K] "Nitrogen gas constant 296.80, Argon gas constant 208"
+ 
+ 
+ 
+"Maximum Work"
+W_max = (U_1 - T_0*S_1 + P_0 * V_1) - (U_0 - T_0*S_0 + P_0 * V_0) 
+           "= (U_1 - U_0) - T_0*(S_1 - S_0) + P_0 *( V_1 - V_0)"
+           "= dU - T_0*dS + P_0 *dV"
+ 
+U_1 = m*C_v1*T_1
+U_0 = m*C_v0*T_0
+"dU = U_1 - U_0"
+ 
+V_1 = m*R*T_1/P_1
+V_0 = m*R*T_0/P_0
+"dV =  V_1 - V_0" 
+ 
+S_1 = m * C_p1 * ln(T_1/T_0) - m * R * ln(P_1/P_0)
+S_0 = m * C_p0 * ln(T_0/T_0) - m * R * ln(P_0/P_0)
+"dS=S_1-S_0"

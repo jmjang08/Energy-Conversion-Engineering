@@ -1,0 +1,95 @@
+$UnitSystem SI MASS RAD bar C kJ
+R$ = 'Water'	"string variable"
+ 
+P_1 = 20
+P_2 = 1.4
+ 
+T_0 = 15
+T_1 = 200
+T_4 = 25
+T_5 = 20
+T_6 = 15
+T_7 = 20
+ 
+x_5 = 0
+ 
+eta_t = 0.8
+eta_p = 0.5
+ 
+ 
+"Problem (a)"
+"Maximum work per kg"
+h_1 = enthalpy(R$,T=T_1,P=P_1)
+h_0 = enthalpy(R$,T=T_0,P=P_1)
+
+s_1 = entropy(R$,T=T_1,P=P_1)
+s_0 = entropy(R$,T=T_0,P=P_1)
+
+T_a = converttemp(C,K,T_0) 
+w_max = (h_1 - h_0) - (T_0 + 273.15[K]) * (s_1 - s_0)
+ 
+ 
+"Problem (b)"
+"Throttle"
+h_2 = h_1
+x_2 = quality(R$,h=h_2,P=P_2)
+T_2 = temperature(R$,P=P_2,x=x_2)
+ 
+ 
+"Problem (c)"
+"Turbine"
+h_3a = enthalpy(R$,P=P_2,x=1)
+s_3a = entropy(R$,P=P_2,x=1)
+h_4s = enthalpy(R$,T=T_4,s=s_3a)
+
+eta_t = (h_3a - h_4) / (h_3a - h_4s)
+
+W_t = 40000 [kW]
+W_t = x_2 * m_dot_1 * (h_3a - h_4)
+ 
+ 
+"Problem (d)"
+"P-h diagram"
+P[1] = P_1
+P[2] = P_2
+P[3] = P_2
+P[4] = pressure(R$,T=T_4,h=h_4)
+P[5] = pressure(R$,T=T_5,x=x_5)
+ 
+h[1] = h_1
+h[2] = h_2
+h[3] = h_3a
+h[4] = h_4
+h[5] = enthalpy(R$,T=T_5,x=x_5)
+ 
+ 
+"Problem (e)"
+"Pump 5-5,p"
+h_5 = h[5]
+s_5 = entropy(R$,T=T_5,x=x_5)
+h_8s = enthalpy(R$,s=s_5,P=P_1)
+eta_p = (h_5 - h_8s) / (h_5 - h_8)
+W_p1 = x_2 * m_dot_1 * (h_8 - h_5)
+m_dot_5 = x_2 * m_dot_1
+ 
+"Pump 3b-4b"
+h_3b = enthalpy(R$,P=P_2,x=0)
+s_3b = entropy(R$,P=P_2,x=0)
+h_4bs = enthalpy(R$,s=s_3b,P=P_1)
+eta_p = (h_3b - h_4bs) / (h_3b - h_4b)
+W_p2 = m_dot_1 * (1 - x_2) * (h_4b - h_3b)
+ 
+"Total Pump"
+W_p = W_p1 + W_p2
+ 
+ 
+"Problem (e)"
+"2nd law efficiency"
+eta_II = (W_t - W_p) / (w_max * m_dot_1) * 100 [%]
+ 
+
+"Problem (g)"
+"Condenser"
+h_6 = enthalpy(R$, T=T_6,P=1.013 [bar]) 
+h_7 = enthalpy(R$, T=T_7,P=1.013 [bar] )
+x_2 * m_dot_1 * (h_4 - h_5) = m_dot_6 * (h_7 - h_6)

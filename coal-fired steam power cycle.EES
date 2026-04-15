@@ -1,0 +1,160 @@
+$UnitSystem SI MASS RAD kPa C kJ
+R$ = 'Water'	"string variable"
+ 
+"Assumptions"
+"1. No pressure drop across all heat exchangers"
+"2. All cycle components are adiabatic with the environment"
+ 
+"Givens"
+eta_t = 0.9
+eta_p = 0.7
+HV_coal = 29 [MJ/kg]
+CF = 0.75
+ 
+P[1] = 3.16
+P[2] = 29e3
+P[3] = 29e3
+P[4] = 2.2e3
+P[5] = 2.2e3
+P[6] = 600
+P[7] = 3.16
+P[8] = 3.16
+P[9] = 600
+P[10] = 3.16
+ 
+T[1] = temperature(R$,P=P[1],x=0)
+T[3] = 580
+T[5] = 580
+//T[9] = temperature(R$,P=P[9],x=0)
+//T[10] = temperature(R$,P=P[10],h=h[9])
+ 
+h[1] = enthalpy(R$,P=P[1],x=0)
+h[3] = enthalpy(R$,P=P[3],T=T[3])
+h[5] = enthalpy(R$,P=P[5],T=T[5])
+//h[9] = enthalpy(R$,x=0,P=P[9])
+//h[10] = h[9]
+ 
+s[1] = entropy(R$,P=P[1],x=0)
+s[3] = entropy(R$,P=P[3],T=T[3])
+s[5] = entropy(R$,P=P[5],T=T[5])
+//s[9] = entropy(R$,P=P[9],h=h[9])
+//s[10] = entropy(R$,P=P[10],h=h[10])
+ 
+ 
+"Problem (a)"
+"HPT"
+s_4s = s[3]
+h_4s = enthalpy(R$,P=P[4],s=s_4s)
+eta_t = (h[3] - h[4]) / (h[3] - h_4s)
+w_hpt = h[3]-h[4]
+s[4] = entropy(R$,P=P[4],h=h[4])
+T[4] = temperature(R$,P=P[4],h=h[4])
+ 
+"IPT"
+s_6s = s[5]
+h_6s = enthalpy(R$,P=P[6],s=s_6s)
+eta_t = (h[5] - h[6]) / (h[5] - h_6s)
+w_ipt = h[5] - h[6]
+s[6] = entropy(R$,P=P[6],h=h[6])
+T[6] = temperature(R$,P=P[6],h=h[6])
+ 
+"LPT"
+s_7s = s[6]
+h_7s = enthalpy(R$,P=P[7],s=s_7s)
+eta_t = (h[6] - h[7]) / (h[6] - h_7s)
+w_lpt = h[6] - h[7]
+s[7] = entropy(R$,P=P[7],h=h[7])
+T[7] = temperature(R$,P=P[7],h=h[7])
+ 
+"PUMP"
+eta_p = (volume(R$,P=P[1],x=0) * (P[2] - P[1])) / (h[2] - h[1])
+w_p = h[2] - h[1] 
+s[2] = entropy(R$,P=P[2],h=h[2])
+T[2] = temperature(R$,P=P[2],h=h[2])
+ 
+"Thermal efficiency 1"
+q_in = h[3] - h[2] + h[5] - h[4]
+eta_th_1 = ((w_hpt + w_ipt + w_lpt - w_p) / q_in) *100[%]
+ 
+ 
+"Problem (b)"
+"mass"
+P_net_1 = 1000 [MW]
+eta_th_1 = (P_net_1 / Q_dot_in) * 100[%]
+Q_dot_in = m_dot_coal * HV_coal
+ 
+mass_coal = m_dot_coal * CF * 365 * 24 * 3600
+MW_coal = 12 + 0.8 + 0.2 * 16
+MW_co2 = 44
+mass_co2 = mass_coal * (MW_co2 / MW_coal)
+ 
+ 
+"Problem (c)"
+"Assumption for CO2 capture process"
+X = 0.454
+ 
+"HPT, IPT, LPT, PUMP"
+m_dot_steam = Q_dot_in / q_in / 0.001 [kg/s]
+W_dot_hpt = m_dot_steam * w_hpt 
+W_dot_ipt = m_dot_steam * w_ipt
+W_dot_lpt = m_dot_steam * (1 - X) * w_lpt
+W_dot_p = m_dot_steam * w_p
+ 
+"Thermal efficiency 2"
+P_net_2 = (W_dot_hpt  + W_dot_ipt + W_dot_lpt - W_dot_p) / 1000 [MW]
+eta_th_2 = ((P_net_2) / Q_dot_in) * 100[%]
+ 
+"CO2 capture"
+m_dot_co2 = m_dot_coal * (MW_co2 / MW_coal)
+n_dot_co2_desorber = 0.9 * (m_dot_co2 / MW_co2)
+m_dot_co2_desorber = n_dot_co2_desorber * MW_co2
+ 
+"CO2 compression"
+T_0 = 25 [C]
+P_0 = 101 [C]
+P_co2 = 10000 [kPa]
+ 
+s_co2_in = entropy(carbondioxide,T=T_0,P=P_0)
+h_co2_in = enthalpy(carbondioxide,T=T_0,P=P_0)
+s_co2_out_isop = entropy(carbondioxide,T=T_0,P=P_co2)
+h_co2_out_isop = enthalpy(carbondioxide,T=T_0,P=P_co2)
+W_dot_co2_comp_isot = m_dot_co2_desorber * ((h_co2_out_isop-h_co2_in) - convertTemp(C, K, T_0) * (s_co2_out_isop - s_co2_in))
+ 
+eta_co2_comp_adia = 0.8 
+s_co2s_out = s_co2_in
+h_co2s_out = enthalpy(carbondioxide,s=s_co2s_out,P=P_co2)
+eta_co2_comp_adia = (h_co2s_out - h_co2_in) / (h_co2_out - h_co2_in)
+W_dot_co2_comp_adia = m_dot_co2_desorber * (h_co2_out - h_co2_in)
+ 
+W_dot_co2_comp = (W_dot_co2_comp_adia + W_dot_co2_comp_isot) / 2
+ 
+"Thermal efficiency 3" 
+P_net_3 = (W_dot_hpt + W_dot_ipt + W_dot_lpt - W_dot_p - W_dot_co2_comp) / 1000 [MW]
+eta_th_3 = ((P_net_3) / Q_dot_in) *100[%]
+ 
+ 
+"Problem (d)"
+"Minimum work per mole of O2 in ASU"
+"w_min = -RTo(Xa*lnXa+Xb*lnXb) [kJ]"
+"w_min/Xa = -RTo(lnXa+Xb/Xa*lnXb) [kJ/kmol]"
+R = 8.314
+X_o2 = 0.21 "air = 0.21 O2, 0.79 N2"
+w_asu_ideal = -R * convertTemp(C, K, T_0) * ( ln(X_o2) + (1 - X_o2) / X_o2 * ln(1 - X_o2) ) 
+ 
+"stoichiometric combustion for hydrocarbon with oxygen" 
+"CxHy + (x+y/4) O2 = x CO2 + y/2 H2O"
+"C1.0 H0.8 O0.2"
+"1+0.8 / 4 =1.2 O2"
+"O0.2 = 0.1 O2"
+"1.1 O2"
+n_o2 = 1.1
+n_dot_o2 = (m_dot_coal / MW_coal) * n_o2
+eta_asu = 0.2
+W_dot_asu = (w_asu_ideal / eta_asu) * n_dot_o2 "[kW]"
+ 
+"LPT for ASU" 
+W_dot_lpt_asu = m_dot_steam * w_lpt
+ 
+"Thermal efficiency 4" 
+P_net_4 = (W_dot_hpt + W_dot_ipt + W_dot_lpt_asu - W_dot_p - W_dot_co2_comp - W_dot_asu) /1000 [MW]    
+eta_th_4 = (P_net_4 / Q_dot_in) *100[%]
