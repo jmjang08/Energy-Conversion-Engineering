@@ -1,7 +1,7 @@
 $UnitSystem SI Mass kJ C bar
 "Given Condition"
-eta_T 	= 0.85
-T0 	= 15
+eta_T 		= 0.85
+T0 				= 15
 T_gw_in  	= 185
 T_gw_out 	= 35
 cp_gw   	= 4.2
@@ -9,8 +9,8 @@ m_dot_gw	= 200
 T2_given	= 25
 T3_given	= 175
 P_high   	= 150
-P_low  	= 2.43
-T0K    	= 288.15
+P_low  		= 2.43
+T0K    		= 288.15
 T_gw_inK 	= 458.15
 T_gw_outK	= 308.15
  
@@ -98,9 +98,9 @@ eta_I_ratio  = eta_I_R / eta_I_A
 eta_II_ratio = eta_II_R / eta_II_A
  
 { Comparison between R134a and Ammonia
-m_dot_ratio = m_dot_R / m_dot_A    	: mass flow ratio
-Wt_ratio   = Wt_R / Wt_A       		: turbine power ratio
-eta_I_ratio = eta_I_R / eta_I_A 		: first-law efficiency ratio
+m_dot_ratio = m_dot_R / m_dot_A    		: mass flow ratio
+Wt_ratio   = Wt_R / Wt_A       				: turbine power ratio
+eta_I_ratio = eta_I_R / eta_I_A 			: first-law efficiency ratio
 eta_II_ratio = eta_II_R / eta_II_A 		: second-law efficiency ratio }
  
 " 4) T-s diagram data "
