@@ -1,0 +1,137 @@
+$UnitSystem SI Mass kJ C bar
+"Given Condition"
+eta_T 	= 0.85
+T0 	= 15
+T_gw_in  	= 185
+T_gw_out 	= 35
+cp_gw   	= 4.2
+m_dot_gw	= 200
+T2_given	= 25
+T3_given	= 175
+P_high   	= 150
+P_low  	= 2.43
+T0K    	= 288.15
+T_gw_inK 	= 458.15
+T_gw_outK	= 308.15
+ 
+Qin_total = mdot_gw * cp_gw * (T_gw_in - T_gw_out)
+Ex_in = mdot_gw * cp_gw * ((T_gw_inK - T_gw_outK) - T0K * ln(T_gw_inK / T_gw_outK))
+ 
+ 
+" 1) AMMONIA "
+R1$ = 'Ammonia'
+ 
+"State 2"
+h2_A = enthalpy(R1$, T=T2_given, P=P_high)
+s2_A = entropy(R1$, T=T2_given, P=P_high)
+ 
+"State 3"
+h3_A = enthalpy(R1$, T=T3_given, P=P_high)
+s3_A = entropy(R1$, T=T3_given, P=P_high)
+ 
+"State 4s"
+h4s_A = enthalpy(R1$, P=P_low, s=s3_A)
+ 
+"State 4 actual"
+h4_A = h3_A - eta_T * (h3_A - h4s_A)
+T4_A = temperature(R1$, P=P_low, h=h4_A)
+s4_A = entropy(R1$, P=P_low, h=h4_A)
+ 
+"State 1"
+T1_A = temperature(R1$, P=P_low, x=0)
+h1_A = enthalpy(R1$, P=P_low, x=0)
+s1_A = entropy(R1$, P=P_low, x=0)
+ 
+"(a) mass flow rate"
+mdot_A = Qin_total / (h3_A - h2_A)
+ 
+"(b) heat transfer rate into cycle"
+Qin_A = mdot_A * (h3_A - h2_A)
+ 
+"(c) turbine power"
+Wt_A = mdot_A * (h3_A - h4_A)
+  
+"(d) first-law efficiency"
+eta_I_A = Wt_A / Qin_A
+ 
+"(e) second-law efficiency"
+eta_II_A = Wt_A / Ex_in
+ 
+ 
+ 
+" 2) R134a "
+R2$ = 'R134a'
+ 
+"State 2"
+h2_R = enthalpy(R2$, T=T2_given, P=P_high)
+s2_R = entropy(R2$, T=T2_given, P=P_high)
+ 
+"State 3"
+h3_R = enthalpy(R2$, T=T3_given, P=P_high)
+s3_R = entropy(R2$, T=T3_given, P=P_high)
+ 
+"State 4s"
+h4s_R = enthalpy(R2$, P=P_low, s=s3_R)
+ 
+"State 4 actual"
+h4_R = h3_R - eta_T * (h3_R - h4s_R)
+T4_R = temperature(R2$, P=P_low, h=h4_R)
+s4_R = entropy(R2$, P=P_low, h=h4_R)
+ 
+"State 1"
+T1_R = temperature(R2$, P=P_low, x=0)
+h1_R = enthalpy(R2$, P=P_low, x=0)
+s1_R = entropy(R2$, P=P_low, x=0)
+ 
+"(f) R134a results"
+mdot_R = Qin_total / (h3_R - h2_R)
+Qin_R  = mdot_R * (h3_R - h2_R)
+Wt_R   = mdot_R * (h3_R - h4_R)
+eta_I_R  = Wt_R / Qin_R
+eta_II_R = Wt_R / Ex_in
+ 
+ 
+" 3) Comparison terms "
+mdot_ratio  = mdot_R / mdot_A
+Wt_ratio    = Wt_R / Wt_A
+eta_I_ratio  = eta_I_R / eta_I_A
+eta_II_ratio = eta_II_R / eta_II_A
+ 
+{ Comparison between R134a and Ammonia
+mdot_ratio = mdot_R / mdot_A    	: mass flow ratio
+Wt_ratio   = Wt_R / Wt_A       	: turbine power ratio
+eta_I_ratio = eta_I_R / eta_I_A 	: first-law efficiency ratio
+eta_II_ratio = eta_II_R / eta_II_A 	: second-law efficiency ratio
+}
+ 
+" 4) T-s diagram data "
+sA[1] = s1_A
+sA[2] = s2_A
+sA[3] = s3_A
+sA[4] = s4_A
+sA[5] = s1_A
+
+TA[1] = T1_A
+TA[2] = T2_given
+TA[3] = T3_given
+TA[4] = T4_A
+TA[5] = T1_A
+
+sR[1] = s1_R
+sR[2] = s2_R
+sR[3] = s3_R
+sR[4] = s4_R
+sR[5] = s1_R
+
+TR[1] = T1_R
+TR[2] = T2_given
+TR[3] = T3_given
+TR[4] = T4_R
+TR[5] = T1_R
+ 
+{
+mdot_A	:  ammonia mass flow
+mdot_R	:  R134a mass flow
+Wt_A	:  turbine work
+eta_I_A	:  1st law efficiency
+}
