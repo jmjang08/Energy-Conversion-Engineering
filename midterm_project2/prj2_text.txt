@@ -100,8 +100,8 @@ eta_II_ratio = eta_II_R / eta_II_A
  
 { Comparison between R134a and Ammonia
 m_dot_ratio = m_dot_R / m_dot_A    		: mass flow ratio
-Wt_ratio   = Wt_R / Wt_A       				: turbine power ratio
-eta_I_ratio = eta_I_R / eta_I_A 			: first-law efficiency ratio
+Wt_ratio   = Wt_R / Wt_A       			: turbine power ratio
+eta_I_ratio = eta_I_R / eta_I_A 		: first-law efficiency ratio
 eta_II_ratio = eta_II_R / eta_II_A 		: second-law efficiency ratio }
  
 
@@ -133,7 +133,7 @@ TR[5] = T1_R
 
 
 {
-m_dot_A	:  ammonia mass flow
-m_dot_R	:  R134a mass flow
-Wt_A		: turbine work
-eta_I_A	:  1st law efficiency }
+m_dot_A	    : ammonia mass flow
+m_dot_R	    : R134a mass flow
+Wt_A        : turbine work
+eta_I_A     : 1st law efficiency }

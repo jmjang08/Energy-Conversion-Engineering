@@ -1,5 +1,7 @@
 # 1-1. Coal-Fired Steam Power Cycle
 <img src="./img/Coal-Fired Steam Power Cycles.jpg">
+
+
 Supercritical steam enters the high pressure turbine (HPT) at 580 °C and 29 MPa.
 
 After leaving the HPT at a pressure of 2.2 MPa, the steam is reheated to 580 °C and fed into the intermediate pressure turbine (IPT).
@@ -36,8 +38,12 @@ The following information about the steam cycle states is given:
 ## b. If the net power output is 1000 MWe, find the mass of coal consumed and the mass of CO2 emitted annually.
 The capacity factor of the plant is 75%.
 
+
+
 # 1-2. CO2 Capture System
 <img src="./img/CO2 capture system.jpg">
+
+
 The CO2 capture system works in the following way:
 
 Flue gas including CO2 contacts with a mixture of water and monoethanolamine (MEA, NH2CH2CH2OH). The amine mixture captures 90 % of the CO2 in the flue gas.
@@ -64,6 +70,8 @@ Realistically, a multi-stage compressor may be used with the required work falli
 
 # 1-3. Oxy-Combustion with ASU
 <img src="./img/Oxy-Combustion with ASU.jpg">
+
+
 Another method of CO2 capture from coal-fired power plants is oxy- combustion, Air Separation Unit (ASU) requires the minimum work to extract O2 from air
 
 The fuel is burned in pure O2, which is supplied by an air separation unit.
