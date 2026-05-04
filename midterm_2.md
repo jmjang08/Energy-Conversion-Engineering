@@ -1,9 +1,10 @@
 # 1-1. Organic Rankine Cycle
 <img src="./img/Organic Rankine Cycle.png">
+
 Organic Rankine cycles using organic working fluids are used to produce power from low-grade geothermal thermal resources.
 Working fluid: Ammonia 
 The isentropic efficiency of the turbine is ηT = 0.85
-The cooling water enters the condenser at the same temperature as the environment, T0 = 15 °C. 
+The cooling water enters the condenser at the same temperature as the environment, T_0 = 15 °C. 
 
 ## a. What is the mass flow rate of ammonia in the cycle?
 

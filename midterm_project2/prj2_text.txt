@@ -1,7 +1,7 @@
 $UnitSystem SI Mass kJ C bar
 "Given Condition"
 eta_T 		= 0.85
-T0 				= 15
+T0 			= 15
 T_gw_in  	= 185
 T_gw_out 	= 35
 cp_gw   	= 4.2
