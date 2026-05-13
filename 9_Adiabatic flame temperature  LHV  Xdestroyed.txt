@@ -1,0 +1,97 @@
+$UnitSystem SI K bar kJ molar rad
+ 
+"Givens for methane"
+"What is the adiabatic flame temperature Tad of lean burning when the equivalence ratio phi changes (phi <1)"
+"CxHy + a(O2 + 3.76N2) => bCO2 + dH2O + fO2 + a3.76N2" 
+ 
+R$ = 'CH4'	"string variable"
+x = 1
+y = 4
+ 
+a = (x+y/4)/phi
+b = x
+d = y/2
+f = (1-phi)/phi*(x+y/4)
+ 
+"Ideal gas" 
+T_0 = 298  
+P_0 = 1
+P_m = 1
+ 
+phi = 0.65
+ 
+ 
+"Problem (a)"
+"Adiabatic flame temperature"
+"Absolute enthalpy of reactants for T_0"                                  
+H_bar_R = h_bar_CxHy + a*(h_bar_O2_r + 3.76*h_bar_N2_r)
+ 
+h_bar_CxHy = Enthalpy(R$,T=T_0) 
+h_bar_O2_r = Enthalpy(O2,T=T_0) 
+h_bar_N2_r = Enthalpy(N2,T=T_0)
+ 
+ 
+"Absolute enthalpy of products for T_ad"
+H_bar_P = b*h_bar_CO2 + d*h_bar_H2O + f*h_bar_O2_p + a*3.76*h_bar_N2_p
+ 
+h_bar_CO2 = Enthalpy(CO2,T=T_ad)
+h_bar_H2O = Enthalpy(H2O,T=T_ad)
+h_bar_O2_p = Enthalpy(O2,T=T_ad)
+h_bar_N2_p = Enthalpy(N2,T=T_ad) 
+ 
+"Energy balance"
+H_bar_R = H_bar_P
+ 
+ 
+"Problem (b)"
+"Lower Heating Value (LHV)"
+"Absolute enthalpy of products for T_0"
+H_bar_HV = b*h_bar_CO2_HV + d*h_bar_H2O_HV + f*h_bar_O2_HV + a*3.76*h_bar_N2_HV
+ 
+h_bar_CO2_HV = Enthalpy(CO2,T=T_0)
+h_bar_H2O_HV = Enthalpy(H2O,T=T_0)
+h_bar_O2_HV = Enthalpy(O2,T=T_0)
+h_bar_N2_HV = Enthalpy(N2,T=T_0) 
+ 
+"Lower Heating Value (LHV)" 
+LHV = H_bar_R - H_bar_HV 
+ 
+MW_CxHy = MolarMass(R$)
+LHV_CxHy_mass = LHV/MW_CxHy
+ 
+ 
+"Problem (c)"
+"Univertial gas constant"
+R_u = 8.314 "kJ/kmol-K"
+ 
+"Absolute entropy of reactants for T_0"
+S_bar_R = s_bar_CxHy + a*(s_bar_O2_r + 3.76*s_bar_N2_r)
+ 
+N_tot_r = 1+a+a*3.76
+X_CxHy = 1/N_tot_r
+X_O2_r = a/N_tot_r
+X_N2_r = a*3.76/N_tot_r
+ 
+s_bar_CxHy = Entropy(R$,T=T_0,P=P_0) - R_u*ln(X_CxHy*P_m/P_0)
+s_bar_O2_r = Entropy(O2,T=T_0,P=P_0) - R_u*ln(X_O2_r*P_m/P_0)
+s_bar_N2_r = Entropy(N2,T=T_0,P=P_0) - R_u*ln(X_N2_r*P_m/P_0)
+ 
+"Absolute entropy of products for T_ad"
+S_bar_P = b*s_bar_CO2 + d*s_bar_H2O + f*s_bar_O2_p + a*3.76*s_bar_N2_p
+ 
+N_tot_p = b+d+f+a*3.76
+X_CO2 = b/N_tot_p
+X_H2O = d/N_tot_p
+X_O2_p = f/N_tot_p
+X_N2_p = a*3.76/N_tot_p
+ 
+s_bar_CO2 = Entropy(CO2,T=T_ad,P=P_0) - R_u*ln(X_CO2*P_m/P_0)
+s_bar_H2O = Entropy(H2O,T=T_ad,P=P_0) - R_u*ln(X_H2O*P_m/P_0)
+s_bar_O2_p = Entropy(O2,T=T_ad,P=P_0) - R_u*ln(X_O2_p*P_m/P_0)
+s_bar_N2_p = Entropy(N2,T=T_ad,P=P_0) - R_u*ln(X_N2_p*P_m/P_0)
+ 
+"Adiabatic entropy generation" 
+S_gen_ad = S_bar_P - S_bar_R 
+ 
+"Exergy destruction for CxHy combustion"
+Ed = T_0*S_gen_ad

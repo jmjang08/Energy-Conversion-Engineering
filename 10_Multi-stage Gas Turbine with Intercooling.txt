@@ -1,0 +1,237 @@
+$UnitSystem SI K kPa kJ molar rad
+ 
+"Simple Cycle"
+"Assumptions"
+"1. No pressure drop across all combustors and heat exchangers"
+"2. Compositions are frozen throughout compression, expansion processes"
+"3. All cycle components are adiabatic with the environment"
+"4. Complete combustion is assumed in all of the combustors"
+"5. All components are assumed to be ideal gases except for the water in states 11, 12"
+ 
+"Givens"
+T_1 = 298 [K]
+P_1 = 1*Convert(bar,kPa) "[kPa]" "1 [bar]"
+P_2 = 5*P_1 
+T_3 = 308 [K] "By Intercooler"
+P_3 = P_2
+P_4 = 20*P_1
+P_5 = 20*P_1
+T_5 = T_1
+T_6 = 1700 [K]
+P_6 = 20*P_1
+P_7 = 5*P_1
+P_8 = 5*P_1
+T_8 = T_1
+P_9 = 5*P_1
+T_9 = 1700 [K]
+P_10 = P_1
+ 
+eta_c = 0.85
+eta_t = 0.9
+ 
+mdot_air = 600 [kg/s]
+MW_air = 28.84 [kg/kmol]
+MW_ch4 = 16 [kg/kmol]
+ 
+"Problem (c)"
+"Compressor 1-2"
+h_bar_1 = enthalpy(AIR,T=T_1) "kJ/kmol"
+s_bar_1 = entropy(AIR,T=T_1,P=P_1) "kJ/kmol-K"
+s_bar_2s = s_bar_1
+T_2s = temperature(AIR,P=P_2,s=s_bar_2s)
+h_bar_2s = enthalpy(AIR,T=T_2s)
+eta_c = (h_bar_2s-h_bar_1)/(h_bar_2-h_bar_1)
+w_bar_c_1_2 = h_bar_2-h_bar_1
+ 
+"Compressor 3-4"
+h_bar_3 = enthalpy(AIR,T=T_3) "kJ/kmol"
+s_bar_3 = entropy(AIR,T=T_3,P=P_3) "kJ/kmol-K"
+s_bar_4s = s_bar_3
+T_4s = temperature(AIR,P=P_4,s=s_bar_4s)
+h_bar_4s = enthalpy(AIR,T=T_4s)
+eta_c = (h_bar_4s-h_bar_3)/(h_bar_4-h_bar_3)
+w_bar_c_3_4 = h_bar_4-h_bar_3
+ 
+T_4 = temperature(AIR,h=h_bar_4)
+  
+"Combustor 1"
+"phi_1*CxHy + a(O2 + 3.76N2) => bCO2 + dH2O + fO2 + a3.76N2" 
+x = 1
+y = 4
+ 
+a = (x+y/4)
+b = x*phi_1
+d = y/2*phi_1
+f = (1-phi_1)*(x+y/4)
+ 
+"Absolute enthalpy of reactants for T_4 & T_5"
+H_bar_R_1 = phi_1*h_bar_CH4_1 + a*(h_bar_O2_r_1 + 3.76*h_bar_N2_r_1)
+ 
+h_bar_CH4_1 = enthalpy(CH4,T=T_5)
+h_bar_O2_r_1 = enthalpy(O2,T=T_4)
+h_bar_N2_r_1 = enthalpy(N2,T=T_4)
+ 
+"Absolute enthalpy of products for T_6"
+H_bar_P_1 = b*h_bar_CO2_p_1 + d*h_bar_H2O_p_1 + f*h_bar_O2_p_1 + a*3.76*h_bar_N2_p_1
+ 
+h_bar_CO2_p_1 = enthalpy(CO2,T=T_6)
+h_bar_H2O_p_1 = enthalpy(H2O,T=T_6)
+h_bar_O2_p_1 = enthalpy(O2,T=T_6)
+h_bar_N2_p_1 = enthalpy(N2,T=T_6)
+ 
+"Energy balance"
+H_bar_R_1 = H_bar_P_1 
+ 
+"Equivalence ratio for combustor 1"
+AF_st = (4.76*a*MW_air)/MW_ch4
+AF_1 = AF_st/phi_1
+mdot_ch4_5 = mdot_air/AF_1
+ 
+"Mole fraction of products for combustor 1"
+N_tot_6 = b+d+f+a*3.76
+X_CO2_6 = b/N_tot_6
+X_H2O_6 = d/N_tot_6
+X_O2_6 = f/N_tot_6
+X_N2_6 = a*3.76/N_tot_6
+  
+"Turbine 6-7"
+h_bar_6 = b*h_bar_CO2_6+d*h_bar_H2O_6+f*h_bar_O2_6+a*3.76*h_bar_N2_6
+ 
+h_bar_CO2_6 = enthalpy(CO2,T=T_6) 
+h_bar_H2O_6 = enthalpy(H2O,T=T_6) 
+h_bar_O2_6 = enthalpy(O2,T=T_6) 
+h_bar_N2_6 = enthalpy(N2,T=T_6) 
+ 
+s_bar_6 = b*s_bar_CO2_6+d*s_bar_H2O_6+f*s_bar_O2_6+a*3.76*s_bar_N2_6
+ 
+s_bar_CO2_6 = entropy(CO2,T=T_6,P=X_CO2_6*P_6)   
+s_bar_H2O_6 = entropy(H2O,T=T_6,P=X_H2O_6*P_6) 
+s_bar_O2_6 = entropy(O2,T=T_6,P=X_O2_6*P_6) 
+s_bar_N2_6 = entropy(N2,T=T_6,P=X_N2_6*P_6) 
+ 
+s_bar_7s = s_bar_6
+ 
+s_bar_7s = b*s_bar_CO2_7s+d*s_bar_H2O_7s+f*s_bar_O2_7s+a*3.76*s_bar_N2_7s
+{T_7s Iteration}   
+s_bar_CO2_7s = entropy(CO2,T=T_7s,P=X_CO2_6*P_7) 
+s_bar_H2O_7s = entropy(H2O,T=T_7s,P=X_H2O_6*P_7) 
+s_bar_O2_7s = entropy(O2,T=T_7s,P=X_O2_6*P_7) 
+s_bar_N2_7s = entropy(N2,T=T_7s,P=X_N2_6*P_7) 
+ 
+h_bar_7s = b*h_bar_CO2_7s+d*h_bar_H2O_7s+f*h_bar_O2_7s+a*3.76*h_bar_N2_7s
+ 
+h_bar_CO2_7s = enthalpy(CO2,T=T_7s)  
+h_bar_H2O_7s = enthalpy(H2O,T=T_7s) 
+h_bar_O2_7s = enthalpy(O2,T=T_7s) 
+h_bar_N2_7s = enthalpy(N2,T=T_7s)
+ 
+eta_t = (h_bar_6-h_bar_7)/(h_bar_6-h_bar_7s)
+w_bar_t_6_7 = h_bar_6-h_bar_7 "kJ/kmol"
+ 
+h_bar_7 = b*h_bar_CO2_7+d*h_bar_H2O_7+f*h_bar_O2_7+a*3.76*h_bar_N2_7
+{T_7 Iteration}
+h_bar_CO2_7 = enthalpy(CO2,T=T_7)  
+h_bar_H2O_7 = enthalpy(H2O,T=T_7) 
+h_bar_O2_7 = enthalpy(O2,T=T_7) 
+h_bar_N2_7 = enthalpy(N2,T=T_7)
+ 
+"Combustor 2"
+"phi_2*CH4 + bCO2 + dH2O + fO2 + a3.76N2 => bbCO2 + ddH2O + ffO2 + a3.76N2" 
+bb = x*(phi_1+phi_2)
+dd = y/2*(phi_1+phi_2)
+ff = (1-(phi_1+phi_2))*(x+y/4)
+ 
+"Absolute enthalpy of reactants for T_7 & T_8"
+H_bar_R_2 =phi_2* h_bar_CH4_2 + b*h_bar_CO2_r_2 + d*h_bar_H2O_r_2 + f*h_bar_O2_r_2 + a*3.76*h_bar_N2_r_2
+ 
+h_bar_CH4_2 = enthalpy(CH4,T=T_8)
+h_bar_CO2_r_2 = enthalpy(CO2,T=T_7)
+h_bar_H2O_r_2 = enthalpy(H2O,T=T_7)
+h_bar_O2_r_2 = enthalpy(O2,T=T_7)
+h_bar_N2_r_2 = enthalpy(N2,T=T_7)
+ 
+"Absolute enthalpy of products for T_9"
+H_bar_P_2 = bb*h_bar_CO2_p_2 + dd*h_bar_H2O_p_2 + ff*h_bar_O2_p_2 + a*3.76*h_bar_N2_p_2
+ 
+h_bar_CO2_p_2 = enthalpy(CO2,T=T_9)
+h_bar_H2O_p_2 = enthalpy(H2O,T=T_9)
+h_bar_O2_p_2 = enthalpy(O2,T=T_9)
+h_bar_N2_p_2 = enthalpy(N2,T=T_9)
+ 
+"Energy balance"
+H_bar_R_2 = H_bar_P_2
+ 
+"Equivalence ratio for combustor 2"
+MW_co2 = 44 [kg/kmol]
+MW_h2o = 18 [kg/kmol]
+MW_o2 = 32 [kg/kmol]
+MW_n2 = 28 [kg/kmol]
+ 
+m_exh_7 = b*MW_co2+d*MW_h2o+f*MW_o2+a*3.76*MW_n2
+m_ch4_8 = phi_2*MW_ch4
+AF_2 = m_exh_7/m_ch4_8
+mdot_ch4_8 = (mdot_air+mdot_ch4_5)/AF_2
+ 
+"Mole fraction of products for combustor 2"
+N_tot_9 = bb+dd+ff+a*3.76
+X_CO2_9 = bb/N_tot_9
+X_H2O_9 = dd/N_tot_9
+X_O2_9 = ff/N_tot_9
+X_N2_9 = a*3.76/N_tot_9
+ 
+"Turbine 9-10"
+h_bar_9 = bb*h_bar_CO2_9+dd*h_bar_H2O_9+ff*h_bar_O2_9+a*3.76*h_bar_N2_9
+ 
+h_bar_CO2_9 = enthalpy(CO2,T=T_9) 
+h_bar_H2O_9 = enthalpy(H2O,T=T_9) 
+h_bar_O2_9 = enthalpy(O2,T=T_9) 
+h_bar_N2_9 = enthalpy(N2,T=T_9) 
+ 
+s_bar_9 = bb*s_bar_CO2_9+dd*s_bar_H2O_9+ff*s_bar_O2_9+a*3.76*s_bar_N2_9
+ 
+s_bar_CO2_9 = entropy(CO2,T=T_9,P=X_CO2_9*P_9)   
+s_bar_H2O_9 = entropy(H2O,T=T_9,P=X_H2O_9*P_9) 
+s_bar_O2_9 = entropy(O2,T=T_9,P=X_O2_9*P_9) 
+s_bar_N2_9 = entropy(N2,T=T_9,P=X_N2_9*P_9) 
+ 
+s_bar_10s = s_bar_9
+ 
+s_bar_10s = bb*s_bar_CO2_10s+dd*s_bar_H2O_10s+ff*s_bar_O2_10s+a*3.76*s_bar_N2_10s
+ 
+s_bar_CO2_10s = entropy(CO2,T=T_10s,P=X_CO2_9*P_10) 
+s_bar_H2O_10s = entropy(H2O,T=T_10s,P=X_H2O_9*P_10) 
+s_bar_O2_10s = entropy(O2,T=T_10s,P=X_O2_9*P_10) 
+s_bar_N2_10s = entropy(N2,T=T_10s,P=X_N2_9*P_10) 
+ 
+h_bar_10s = bb*h_bar_CO2_10s+dd*h_bar_H2O_10s+ff*h_bar_O2_10s+a*3.76*h_bar_N2_10s
+{T_10s Iteration}   
+h_bar_CO2_10s = enthalpy(CO2,T=T_10s)  
+h_bar_H2O_10s = enthalpy(H2O,T=T_10s) 
+h_bar_O2_10s = enthalpy(O2,T=T_10s) 
+h_bar_N2_10s = enthalpy(N2,T=T_10s)
+ 
+eta_t = (h_bar_9-h_bar_10)/(h_bar_9-h_bar_10s)
+w_bar_t_9_10 = h_bar_9-h_bar_10 "kJ/kmol"
+  
+h_bar_10 = bb*h_bar_CO2_10+dd*h_bar_H2O_10+ff*h_bar_O2_10+a*3.76*h_bar_N2_10
+{T_10 Iteration} 
+h_bar_CO2_10 = enthalpy(CO2,T=T_10)  
+h_bar_H2O_10 = enthalpy(H2O,T=T_10) 
+h_bar_O2_10 = enthalpy(O2,T=T_10) 
+h_bar_N2_10 = enthalpy(N2,T=T_10)
+ 
+ 
+"Problem (b)"
+"Net power and thermal efficiency"
+w_bar_net = w_bar_t_6_7+w_bar_t_9_10-w_bar_c_1_2-w_bar_c_3_4 "kJ/kmol"
+HHV_kmol = 889000 "kJ/kmol"
+eta_th_ref = w_bar_net/HHV_kmol 
+ 
+W_c_1_2 = w_bar_c_1_2*(mdot_air/MW_air) "kW"
+W_c_3_4 = w_bar_c_3_4*(mdot_air/MW_air) "kW"
+W_t_6_7 = w_bar_t_6_7*(mdot_ch4_5/(MW_ch4*phi_1)) "kW"
+W_t_9_10 = w_bar_t_9_10*(mdot_ch4_8/(MW_ch4*phi_2)) "kW"
+ 
+W_net = W_t_6_7+W_t_9_10-W_c_1_2-W_c_3_4 "kW"
+HHV_kg = 889000/MW_ch4 "kJ/kg"
+eta_th = W_net/((mdot_ch4_5+mdot_ch4_8)*HHV_kg)
